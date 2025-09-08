@@ -1,0 +1,21 @@
+services:
+  radio:
+    image: ffmpeg-icecast:latest
+    container_name: radio
+    restart: unless-stopped
+    devices:
+      - /dev/snd:/dev/snd
+    ports:
+      - 8000:8000
+    environment:
+      ICECAST_SOURCE_PASSWORD: supersecret
+      ICECAST_ADMIN_PASSWORD: adminsecret
+      ICECAST_HOSTNAME: 0.0.0.0
+      ALSA_DEVICE: hw:1,0
+      STREAM_CODEC: aac
+      STREAM_MOUNT: /stream.aac
+      STREAM_BITRATE: 256k
+      STREAM_NAME: "LAN Radio"
+      STREAM_DESC: "Live AAC stream over LAN"
+      STREAM_URL: "http://localhost:8000/stream.aac"
+      STREAM_GENRE: "Live"
