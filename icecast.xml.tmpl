@@ -1,0 +1,46 @@
+<icecast>
+  <location>Server</location>
+  <admin>${ICECAST_HOSTNAME}</admin>
+  <hostname>${ICECAST_HOSTNAME}</hostname>
+  <limits>
+    <clients>512</clients>
+    <sources>8</sources>
+    <queue-size>524288</queue-size>
+    <client-timeout>30</client-timeout>
+    <header-timeout>15</header-timeout>
+    <source-timeout>10</source-timeout>
+    <burst-on-connect>1</burst-on-connect>
+    <burst-size>65535</burst-size>
+  </limits>
+  <authentication>
+    <source-password>${ICECAST_SOURCE_PASSWORD}</source-password>
+    <relay-password>${ICECAST_RELAY_PASSWORD}</relay-password>
+    <admin-user>admin</admin-user>
+    <admin-password>${ICECAST_ADMIN_PASSWORD}</admin-password>
+  </authentication>
+  <listen-socket>
+    <port>${ICECAST_LISTEN_PORT}</port>
+    <!-- You can add <bind-address>0.0.0.0</bind-address> if needed -->
+  </listen-socket>
+  <fileserve>1</fileserve>
+  <paths>
+    <basedir>/usr/share/icecast</basedir>
+    <logdir>/var/log/icecast</logdir>
+    <webroot>/usr/share/icecast/web</webroot>
+    <adminroot>/usr/share/icecast/admin</adminroot>
+    <alias source="/" dest="/status.xsl"/>
+  </paths>
+  <logging>
+    <accesslog>-</accesslog>
+    <errorlog>-</errorlog>
+    <loglevel>3</loglevel>
+    <logsize>10000</logsize>
+  </logging>
+  <security>
+    <chroot>0</chroot>
+    <changeowner>
+      <user>icecast</user>
+      <group>icecast</group>
+    </changeowner>
+  </security>
+</icecast>
