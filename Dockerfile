@@ -1,29 +1,30 @@
-FROM alpine:3.20
+FROM alpine:3
 
 RUN apk add --no-cache \
+    bash \
+    coreutils \
+    ffmpeg \
+    gettext \
     icecast \
     mailcap \
-    ffmpeg \
-    bash \
-    tini \
     su-exec \
-    coreutils \
-    gettext
+    tini
 
-ENV ICECAST_SOURCE_PASSWORD=sourcepass \
-    ICECAST_ADMIN_PASSWORD=adminpass \
-    ICECAST_RELAY_PASSWORD=relaypass \
-    ICECAST_LISTEN_PORT=8000 \
-    ICECAST_HOSTNAME=localhost \
-    STREAM_MOUNT=/stream.mp3 \
-    STREAM_NAME="My FFmpeg Stream" \
-    STREAM_DESC="Live audio via ALSA → FFmpeg → Icecast" \
-    STREAM_URL="http://localhost:8000/stream.mp3" \
-    STREAM_GENRE="Live" \
-    STREAM_BITRATE=256k \
-    SAMPLE_RATE=48000 \
+ENV ALSA_DEVICE=hw:1,0 \
     CHANNELS=2 \
-    ALSA_DEVICE=hw:Generic_1,0
+    ICECAST_ADMIN_PASSWORD=adminpass \
+    ICECAST_HOSTNAME=localhost \
+    ICECAST_LISTEN_PORT=8000 \
+    ICECAST_RELAY_PASSWORD=relaypass \
+    ICECAST_SOURCE_PASSWORD=sourcepass \
+    SAMPLE_RATE=48000 \
+    STREAM_BITRATE=256k \
+    STREAM_CODEC=aac \
+    STREAM_DESC="Live audio via ALSA → FFmpeg → Icecast" \
+    STREAM_GENRE="Live" \
+    STREAM_MOUNT=/stream.aac \
+    STREAM_NAME="My FFmpeg Stream" \
+    STREAM_URL="http://localhost:8000/stream.aac"
 
 COPY icecast.xml.tmpl /etc/icecast/icecast.xml.tmpl
 COPY entrypoint.sh /entrypoint.sh
