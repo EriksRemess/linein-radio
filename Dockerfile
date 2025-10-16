@@ -69,6 +69,10 @@ RUN apk add --no-cache \
     su-exec \
     tini
 
+RUN addgroup -S icecast && \
+    adduser -S -G icecast -H -h /var/lib/icecast icecast && \
+    install -d -o icecast -g icecast /var/log/icecast
+
 COPY --from=builder /tmp/install/ /
 
 ENV ALSA_DEVICE=hw:1,0 \

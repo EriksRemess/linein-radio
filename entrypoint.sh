@@ -2,9 +2,10 @@
 set -euo pipefail
 
 envsubst < /etc/icecast/icecast.xml.tmpl > /etc/icecast/icecast.xml
+chown icecast:icecast /etc/icecast/icecast.xml
 
 echo "[entrypoint] starting icecast..."
-icecast -c /etc/icecast/icecast.xml &
+su-exec icecast:icecast icecast -c /etc/icecast/icecast.xml &
 ICECAST_PID=$!
 
 # Wait for Icecast
