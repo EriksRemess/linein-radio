@@ -27,9 +27,6 @@ RUN apk add --no-cache \
     rhash-dev \
     speex-dev
 
-RUN mkdir -p /models && \
-    wget -O /models/std.rnnn https://raw.githubusercontent.com/richardpl/arnndn-models/refs/heads/master/std.rnnn
-
 WORKDIR /usr/src/igloo
 RUN git clone --depth 1 --branch "${IGLOO_REF}" --single-branch "${IGLOO_REPO}" . && \
     git checkout "${IGLOO_COMMIT}" && \
@@ -77,6 +74,9 @@ RUN addgroup -S icecast && \
     install -d -o icecast -g icecast /var/log/icecast
 
 COPY --from=builder /tmp/install/ /
+
+RUN mkdir -p /models && \
+    wget -O /models/std.rnnn https://raw.githubusercontent.com/richardpl/arnndn-models/refs/heads/master/std.rnnn
 
 ENV ALSA_DEVICE=hw:1,0 \
     CHANNELS=2 \
