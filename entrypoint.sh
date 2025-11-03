@@ -59,7 +59,7 @@ esac
 echo "[entrypoint] codec=${STREAM_CODEC}, mount=${MOUNT}, alsa=${ALSA_DEV} → ${ICE_URL}"
 
 COMMON_IN_PRE="-hide_banner -nostats -fflags +genpts -f alsa -thread_queue_size 8192 -use_wallclock_as_timestamps 1 -i ${ALSA_DEV} -ac ${CH} -ar ${SR}"
-COMMON_AF="-af aresample=async=1:min_hard_comp=0.100:first_pts=0 -af anlmdn"
+COMMON_AF="-af aresample=async=1:min_hard_comp=0.100:first_pts=0,afftdn=nt=w:nr=18:nf=-60,lowpass=f=16000"
 
 ffmpeg ${COMMON_IN_PRE} ${COMMON_AF} ${SAMPLE_OPTS} \
   ${ENC_OPTS} \
