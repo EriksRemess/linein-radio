@@ -1,11 +1,11 @@
 FROM alpine:3 AS builder
 
 ARG IGLOO_REPO=https://gitlab.xiph.org/xiph/icecast-libigloo.git
-ARG IGLOO_REF=v0.9.4
-ARG IGLOO_COMMIT=d3a8ca99cc3dc551653fbbc8ce135c02b841447a
+ARG IGLOO_REF=v0.9.5
+ARG IGLOO_COMMIT=1a4f57543f3d441982f6999370fd8a23c229b592
 ARG ICECAST_REPO=https://gitlab.xiph.org/xiph/icecast-server.git
-ARG ICECAST_REF=v2.5.0-rc1
-ARG ICECAST_COMMIT=02d5298a994fb86db8f3fd2b23c50f66304a3ab5
+ARG ICECAST_REF=v2.5.0
+ARG ICECAST_COMMIT=57580f16b05bbfc81658298eec996b6f9e0b8c6b
 
 RUN apk add --no-cache \
     autoconf \
