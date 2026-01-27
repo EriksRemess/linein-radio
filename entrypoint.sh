@@ -79,6 +79,7 @@ get_bitrate() {
 
 OUTPUTS_DESC=()
 FF_OUTPUTS=()
+MOUNTS=()
 
 for raw_codec in "${CODEC_LIST[@]}"; do
   codec="${raw_codec//[[:space:]]/}"
@@ -131,19 +132,20 @@ for raw_codec in "${CODEC_LIST[@]}"; do
 
   ICE_URL="icecast://source:${ICECAST_SOURCE_PASSWORD}@127.0.0.1:${PORT}${MOUNT}"
   OUTPUTS_DESC+=("codec=${codec}, mount=${MOUNT}, alsa=${ALSA_DEV} → ${ICE_URL}")
+  MOUNTS+=("${MOUNT}")
 
   case "${codec}" in
     aac)
       ENC_OPTS=(-c:a aac -profile:a aac_low -b:a "${BR_CODEC}" -sample_fmt fltp)
-      MUX_OPTS=(-f adts -content_type audio/aac -muxpreload 0 -muxdelay 0 -reset_timestamps 1 -metadata title="${NAME_CODEC}")
+      MUX_OPTS=(-f adts -content_type audio/aac -muxpreload 0 -muxdelay 0 -reset_timestamps 1 -metadata title="${STREAM_NAME}")
       ;;
     mp3)
       ENC_OPTS=(-c:a libmp3lame -b:a "${BR_CODEC}" -write_xing 0 -sample_fmt s16p)
-      MUX_OPTS=(-f mp3 -content_type audio/mpeg -muxpreload 0 -muxdelay 0 -reset_timestamps 1 -id3v2_version 3 -write_id3v2 1 -metadata title="${NAME_CODEC}")
+      MUX_OPTS=(-f mp3 -content_type audio/mpeg -muxpreload 0 -muxdelay 0 -reset_timestamps 1 -id3v2_version 3 -write_id3v2 1 -metadata title="${STREAM_NAME}")
       ;;
     opus)
       ENC_OPTS=(-c:a libopus -b:a "${BR_CODEC}" -application audio -frame_duration 20)
-      MUX_OPTS=(-f ogg -content_type application/ogg -muxpreload 0 -muxdelay 0 -reset_timestamps 1 -metadata title="${NAME_CODEC}")
+      MUX_OPTS=(-f ogg -content_type application/ogg -muxpreload 0 -muxdelay 0 -reset_timestamps 1 -metadata title="${STREAM_NAME}")
       ;;
   esac
 
@@ -167,6 +169,32 @@ COMMON_AF=(-af "aresample=async=1:min_hard_comp=0.100:first_pts=0")
 ffmpeg "${COMMON_IN_PRE[@]}" "${COMMON_AF[@]}" \
   "${FF_OUTPUTS[@]}" &
 FFMPEG_PID=$!
+
+set_mount_title() {
+  local mount="$1"
+  local title="$2"
+  local admin_pass="${ICECAST_ADMIN_PASSWORD:-}"
+  if [ -z "${admin_pass}" ]; then
+    echo "[entrypoint] WARN: ICECAST_ADMIN_PASSWORD not set; skipping metadata update for ${mount}" >&2
+    return 0
+  fi
+  for i in {1..20}; do
+    if curl -fsS -u "admin:${admin_pass}" "http://127.0.0.1:${PORT}/admin/metadata" \
+      --data-urlencode "mount=${mount}" \
+      --data-urlencode "mode=updinfo" \
+      --data-urlencode "song=${title}" >/dev/null; then
+      echo "[entrypoint] set mount metadata: ${mount} -> ${title}"
+      return 0
+    fi
+    sleep 0.5
+  done
+  echo "[entrypoint] WARN: failed to set metadata for ${mount}" >&2
+  return 1
+}
+
+for i in "${!MOUNTS[@]}"; do
+  set_mount_title "${MOUNTS[$i]}" "${STREAM_NAME}" || true
+done
 
 term_handler() {
   echo "[entrypoint] stopping..."
