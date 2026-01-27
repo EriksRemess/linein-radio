@@ -1,24 +1,25 @@
 services:
   radio:
-    image: ffmpeg-icecast:latest
+    image: ghcr.io/eriksremess/linein-radio:latest
     container_name: radio
     restart: unless-stopped
     devices:
       - /dev/snd:/dev/snd
     ports:
-      - 8000:8000
+      - <PORT>:<ICECAST_LISTEN_PORT>
     environment:
       ICECAST_SOURCE_PASSWORD: supersecret
       ICECAST_ADMIN_PASSWORD: adminsecret
       ICECAST_HOSTNAME: 0.0.0.0
+      ICECAST_LISTEN_PORT: <ICECAST_LISTEN_PORT>
       ALSA_DEVICE: hw:1,0
       STREAM_CODECS: "aac,mp3"
       STREAM_MOUNT_AAC: /stream.aac
       STREAM_MOUNT_MP3: /stream.mp3
       STREAM_BITRATE_AAC: 256k
       STREAM_BITRATE_MP3: 192k
-      STREAM_NAME: "LAN Radio"
-      STREAM_DESC: "Live stream over LAN"
-      STREAM_URL_AAC: "http://<LAN-IP>:8000/stream.aac"
-      STREAM_URL_MP3: "http://<LAN-IP>:8000/stream.mp3"
+      STREAM_NAME: "Line-in Radio"
+      STREAM_DESC: "Live stream"
+      STREAM_URL_AAC: "http://<HOST-IP-or-HOSTNAME>:<PORT>/stream.aac"
+      STREAM_URL_MP3: "http://<HOST-IP-or-HOSTNAME>:<PORT>/stream.mp3"
       STREAM_GENRE: "Live"

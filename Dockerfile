@@ -85,11 +85,11 @@ ENV ALSA_DEVICE=hw:1,0 \
     SAMPLE_RATE=48000 \
     STREAM_BITRATE=256k \
     STREAM_CODEC=aac \
-    STREAM_DESC="Live audio via ALSA → FFmpeg → Icecast" \
+    STREAM_DESC="Live stream" \
     STREAM_GENRE="Live" \
     STREAM_MOUNT=/stream.aac \
-    STREAM_NAME="My FFmpeg Stream" \
-    STREAM_URL="http://localhost:8000/stream.aac"
+    STREAM_NAME="Line-in Radio" \
+    STREAM_URL="http://localhost:${ICECAST_LISTEN_PORT}/stream.aac"
 
 COPY icecast.xml.tmpl /etc/icecast/icecast.xml.tmpl
 COPY entrypoint.sh /entrypoint.sh
