@@ -12,10 +12,13 @@ services:
       ICECAST_ADMIN_PASSWORD: adminsecret
       ICECAST_HOSTNAME: 0.0.0.0
       ALSA_DEVICE: hw:1,0
-      STREAM_CODEC: aac
-      STREAM_MOUNT: /stream.aac
-      STREAM_BITRATE: 256k
+      STREAM_CODECS: "aac,mp3"
+      STREAM_MOUNT_AAC: /stream.aac
+      STREAM_MOUNT_MP3: /stream.mp3
+      STREAM_BITRATE_AAC: 256k
+      STREAM_BITRATE_MP3: 192k
       STREAM_NAME: "LAN Radio"
-      STREAM_DESC: "Live AAC stream over LAN"
-      STREAM_URL: "http://localhost:8000/stream.aac"
+      STREAM_DESC: "Live stream over LAN"
+      STREAM_URL_AAC: "http://<LAN-IP>:8000/stream.aac"
+      STREAM_URL_MP3: "http://<LAN-IP>:8000/stream.mp3"
       STREAM_GENRE: "Live"

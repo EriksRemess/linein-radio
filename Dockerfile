@@ -75,9 +75,6 @@ RUN addgroup -S icecast && \
 
 COPY --from=builder /tmp/install/ /
 
-# RUN mkdir -p /models && \
-#     wget -O /models/std.rnnn https://raw.githubusercontent.com/richardpl/arnndn-models/refs/heads/master/std.rnnn
-
 ENV ALSA_DEVICE=hw:1,0 \
     CHANNELS=2 \
     ICECAST_ADMIN_PASSWORD=adminpass \
