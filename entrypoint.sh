@@ -135,15 +135,15 @@ for raw_codec in "${CODEC_LIST[@]}"; do
   case "${codec}" in
     aac)
       ENC_OPTS=(-c:a aac -profile:a aac_low -b:a "${BR_CODEC}" -sample_fmt fltp)
-      MUX_OPTS=(-f adts -content_type audio/aac -muxpreload 0 -muxdelay 0 -reset_timestamps 1)
+      MUX_OPTS=(-f adts -content_type audio/aac -muxpreload 0 -muxdelay 0 -reset_timestamps 1 -metadata title="${NAME_CODEC}")
       ;;
     mp3)
       ENC_OPTS=(-c:a libmp3lame -b:a "${BR_CODEC}" -write_xing 0 -sample_fmt s16p)
-      MUX_OPTS=(-f mp3 -content_type audio/mpeg -muxpreload 0 -muxdelay 0 -reset_timestamps 1)
+      MUX_OPTS=(-f mp3 -content_type audio/mpeg -muxpreload 0 -muxdelay 0 -reset_timestamps 1 -id3v2_version 3 -write_id3v2 1 -metadata title="${NAME_CODEC}")
       ;;
     opus)
       ENC_OPTS=(-c:a libopus -b:a "${BR_CODEC}" -application audio -frame_duration 20)
-      MUX_OPTS=(-f ogg -content_type application/ogg -muxpreload 0 -muxdelay 0 -reset_timestamps 1)
+      MUX_OPTS=(-f ogg -content_type application/ogg -muxpreload 0 -muxdelay 0 -reset_timestamps 1 -metadata title="${NAME_CODEC}")
       ;;
   esac
 
