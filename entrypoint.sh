@@ -145,7 +145,8 @@ for raw_codec in "${CODEC_LIST[@]}"; do
   GENRE_CODEC="$(get_override STREAM_GENRE "${STREAM_GENRE}" "${codec}")"
 
   ICE_URL="icecast://source:${ICECAST_SOURCE_PASSWORD}@127.0.0.1:${PORT}${MOUNT}"
-  OUTPUTS_DESC+=("codec=${codec}, mount=${MOUNT}, alsa=${ALSA_DEV} → ${ICE_URL}")
+  ICE_URL_LOG="icecast://source:***@127.0.0.1:${PORT}${MOUNT}"
+  OUTPUTS_DESC+=("codec=${codec}, mount=${MOUNT}, alsa=${ALSA_DEV} → ${ICE_URL_LOG}")
   MOUNTS+=("${MOUNT}")
 
   case "${codec}" in
