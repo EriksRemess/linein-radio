@@ -1,0 +1,13 @@
+#!/usr/bin/env sh
+set -eu
+
+ready_file="${MOCK_ICECAST_READY_FILE:-/tmp/mock-icecast-ready}"
+mkdir -p "$(dirname "${ready_file}")"
+: > "${ready_file}"
+
+stop=0
+trap 'stop=1' TERM INT
+
+while [ "${stop}" -eq 0 ]; do
+  sleep 0.1
+done

@@ -11,12 +11,26 @@ ICECAST_PID=$!
 # Wait for Icecast
 PORT="${ICECAST_LISTEN_PORT:-8000}"
 echo "[entrypoint] waiting for icecast on port ${PORT}..."
+ICECAST_READY=0
 for i in {1..60}; do
   if nc -z 127.0.0.1 "${PORT}" 2>/dev/null; then
+    ICECAST_READY=1
     break
+  fi
+  if ! kill -0 "${ICECAST_PID}" 2>/dev/null; then
+    wait "${ICECAST_PID}" 2>/dev/null || true
+    echo "[entrypoint] ERROR: icecast exited before becoming ready" >&2
+    exit 1
   fi
   sleep 0.5
 done
+
+if [ "${ICECAST_READY}" -ne 1 ]; then
+  echo "[entrypoint] ERROR: icecast did not become ready on port ${PORT} within 30s" >&2
+  kill -TERM "${ICECAST_PID}" 2>/dev/null || true
+  wait "${ICECAST_PID}" 2>/dev/null || true
+  exit 1
+fi
 
 ALSA_DEV="${ALSA_DEVICE:-hw:1,0}"
 SR="${SAMPLE_RATE:-48000}"
@@ -203,7 +217,19 @@ term_handler() {
   wait "${FFMPEG_PID}" 2>/dev/null || true
   wait "${ICECAST_PID}" 2>/dev/null || true
 }
-trap term_handler SIGTERM SIGINT
 
-wait -n || true
+# shellcheck disable=SC2317
+signal_handler() {
+  term_handler
+  exit 143
+}
+trap signal_handler SIGTERM SIGINT
+
+if wait -n "${FFMPEG_PID}" "${ICECAST_PID}"; then
+  EXIT_CODE=0
+else
+  EXIT_CODE=$?
+fi
+
 term_handler
+exit "${EXIT_CODE}"

@@ -1,0 +1,9 @@
+#!/usr/bin/env sh
+set -eu
+
+ready_file="${MOCK_ICECAST_READY_FILE:-/tmp/mock-icecast-ready}"
+if [ -f "${ready_file}" ]; then
+  exit 0
+fi
+
+exit 1

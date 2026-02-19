@@ -1,0 +1,9 @@
+#!/usr/bin/env sh
+set -eu
+
+args_file="${MOCK_FFMPEG_ARGS_FILE:-/tmp/mock-ffmpeg-args.txt}"
+mkdir -p "$(dirname "${args_file}")"
+printf '%s\n' "$*" > "${args_file}"
+
+sleep "${MOCK_FFMPEG_SLEEP_SECONDS:-0.2}"
+exit "${MOCK_FFMPEG_EXIT_CODE:-0}"
