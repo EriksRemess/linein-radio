@@ -7,6 +7,29 @@ chown icecast:icecast /etc/icecast/icecast.xml
 echo "[entrypoint] starting icecast..."
 su-exec icecast:icecast icecast -c /etc/icecast/icecast.xml &
 ICECAST_PID=$!
+FFMPEG_PID=""
+
+stop_pid() {
+  local pid="${1:-}"
+  if [ -z "${pid}" ]; then
+    return 0
+  fi
+  kill -TERM "${pid}" 2>/dev/null || true
+  wait "${pid}" 2>/dev/null || true
+}
+
+term_handler() {
+  echo "[entrypoint] stopping..."
+  stop_pid "${FFMPEG_PID:-}"
+  stop_pid "${ICECAST_PID:-}"
+}
+
+# shellcheck disable=SC2317
+signal_handler() {
+  term_handler
+  exit 143
+}
+trap signal_handler SIGTERM SIGINT
 
 # Wait for Icecast
 PORT="${ICECAST_LISTEN_PORT:-8000}"
@@ -210,21 +233,6 @@ set_mount_title() {
 for i in "${!MOUNTS[@]}"; do
   set_mount_title "${MOUNTS[$i]}" "${STREAM_NAME}" || true
 done
-
-term_handler() {
-  echo "[entrypoint] stopping..."
-  kill -TERM "${FFMPEG_PID}" 2>/dev/null || true
-  kill -TERM "${ICECAST_PID}" 2>/dev/null || true
-  wait "${FFMPEG_PID}" 2>/dev/null || true
-  wait "${ICECAST_PID}" 2>/dev/null || true
-}
-
-# shellcheck disable=SC2317
-signal_handler() {
-  term_handler
-  exit 143
-}
-trap signal_handler SIGTERM SIGINT
 
 if wait -n "${FFMPEG_PID}" "${ICECAST_PID}"; then
   EXIT_CODE=0

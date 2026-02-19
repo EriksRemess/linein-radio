@@ -7,18 +7,15 @@ on:
   pull_request:
     branches: [ "main" ]
 
-permissions:
-  contents: read
-  packages: write
-  id-token: write
-
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  build:
+  verify:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout
@@ -38,24 +35,19 @@ jobs:
       - name: Build local image for smoke tests
         run: docker build -t linein-radio:smoke .
 
-      - name: Smoke test container startup (single + multi codec)
+      - name: Smoke test container startup
         run: tests/smoke/run-container-smoke.sh linein-radio:smoke
 
       - name: Set up QEMU (for arm64 cross-compile)
+        if: ${{ github.event_name == 'pull_request' }}
         uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
+        if: ${{ github.event_name == 'pull_request' }}
         uses: docker/setup-buildx-action@v3
 
-      - name: Log in to GHCR
-        if: ${{ github.event_name != 'pull_request' }}
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Extract Docker metadata (tags, labels)
+        if: ${{ github.event_name == 'pull_request' }}
         id: meta
         uses: docker/metadata-action@v5
         with:
@@ -81,8 +73,44 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+  publish:
+    if: ${{ github.event_name != 'pull_request' }}
+    needs: verify
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU (for arm64 cross-compile)
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract Docker metadata (tags, labels)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ghcr.io/${{ github.repository }}
+          tags: |
+            type=sha,format=short,prefix=sha-
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+            type=semver,pattern={{version}},enable=${{ startsWith(github.ref, 'refs/tags/') }}
+            type=semver,pattern={{major}}.{{minor}},enable=${{ startsWith(github.ref, 'refs/tags/') }}
+            type=semver,pattern={{major}},enable=${{ startsWith(github.ref, 'refs/tags/') }}
+
       - name: Build & Push (main branch & tags)
-        if: ${{ github.event_name != 'pull_request' }}
         uses: docker/build-push-action@v6
         with:
           context: .

@@ -2,8 +2,15 @@
 set -eu
 
 ready_file="${MOCK_ICECAST_READY_FILE:-/tmp/mock-icecast-ready}"
-mkdir -p "$(dirname "${ready_file}")"
-: > "${ready_file}"
+
+if [ "${MOCK_ICECAST_EXIT_IMMEDIATELY:-0}" = "1" ]; then
+  exit "${MOCK_ICECAST_EXIT_CODE:-1}"
+fi
+
+if [ "${MOCK_ICECAST_READY:-1}" = "1" ]; then
+  mkdir -p "$(dirname "${ready_file}")"
+  : > "${ready_file}"
+fi
 
 stop=0
 trap 'stop=1' TERM INT
