@@ -204,7 +204,10 @@ COMMON_IN_PRE=(-hide_banner -nostats -fflags +genpts -f alsa -thread_queue_size 
 # COMMON_AF="-af aresample=async=1:first_pts=0,arnndn=m=/models/std.rnnn:mix=0.85,lowpass=f=17000"
 COMMON_AF=(-af "aresample=async=1:min_hard_comp=0.100:first_pts=0")
 
-ffmpeg "${COMMON_IN_PRE[@]}" "${COMMON_AF[@]}" \
+FFMPEG_LOG_REDACT='s#(icecast://[^:@/]+:)[^@]*@#\1***@#g'
+
+ffmpeg -loglevel warning "${COMMON_IN_PRE[@]}" "${COMMON_AF[@]}" \
+  2> >(sed -E "${FFMPEG_LOG_REDACT}" >&2) \
   "${FF_OUTPUTS[@]}" &
 FFMPEG_PID=$!
 
