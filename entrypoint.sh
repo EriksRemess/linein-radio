@@ -1,6 +1,19 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+ICECAST_HOSTNAME="${ICECAST_HOSTNAME:-localhost}"
+ICECAST_LISTEN_PORT="${ICECAST_LISTEN_PORT:-8000}"
+
+: "${ICECAST_SOURCE_PASSWORD:?ICECAST_SOURCE_PASSWORD is required}"
+: "${ICECAST_ADMIN_PASSWORD:?ICECAST_ADMIN_PASSWORD is required}"
+ICECAST_RELAY_PASSWORD="${ICECAST_RELAY_PASSWORD:-${ICECAST_SOURCE_PASSWORD}}"
+
+export ICECAST_HOSTNAME
+export ICECAST_LISTEN_PORT
+export ICECAST_SOURCE_PASSWORD
+export ICECAST_ADMIN_PASSWORD
+export ICECAST_RELAY_PASSWORD
+
 envsubst < /etc/icecast/icecast.xml.tmpl > /etc/icecast/icecast.xml
 chown icecast:icecast /etc/icecast/icecast.xml
 
@@ -63,7 +76,7 @@ STREAM_CODEC="${STREAM_CODEC:-aac}"
 STREAM_CODECS="${STREAM_CODECS:-}"
 STREAM_NAME="${STREAM_NAME:-Line-in Radio}"
 STREAM_DESC="${STREAM_DESC:-Live audio via ALSA → FFmpeg → Icecast}"
-STREAM_URL="${STREAM_URL:-}"
+STREAM_URL="${STREAM_URL:-http://localhost:${PORT}/stream.aac}"
 STREAM_GENRE="${STREAM_GENRE:-Live}"
 
 if [ -z "${STREAM_CODECS}" ]; then

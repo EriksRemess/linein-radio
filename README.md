@@ -31,8 +31,13 @@ docker compose up -d
 - Opus: `http://<HOST-IP-or-HOSTNAME>:<PORT>/stream.ogg`
 
 ## Configuration
-All settings are environment variables. The defaults are in `Dockerfile` and can be overridden in
+All settings are environment variables. Most defaults are in `Dockerfile` and can be overridden in
 `compose.yml`.
+
+Required credentials:
+- `ICECAST_SOURCE_PASSWORD`
+- `ICECAST_ADMIN_PASSWORD`
+- `ICECAST_RELAY_PASSWORD` (optional; defaults to `ICECAST_SOURCE_PASSWORD`)
 
 ### Port configuration
 Icecast listens on `ICECAST_LISTEN_PORT` (default `8000`). Expose the same port in your compose file:

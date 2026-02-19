@@ -77,11 +77,8 @@ COPY --from=builder /tmp/install/ /
 
 ENV ALSA_DEVICE=hw:1,0 \
     CHANNELS=2 \
-    ICECAST_ADMIN_PASSWORD=adminpass \
     ICECAST_HOSTNAME=localhost \
     ICECAST_LISTEN_PORT=8000 \
-    ICECAST_RELAY_PASSWORD=relaypass \
-    ICECAST_SOURCE_PASSWORD=sourcepass \
     SAMPLE_RATE=48000 \
     STREAM_BITRATE=256k \
     STREAM_CODEC=aac \
@@ -89,7 +86,7 @@ ENV ALSA_DEVICE=hw:1,0 \
     STREAM_GENRE="Live" \
     STREAM_MOUNT=/stream.aac \
     STREAM_NAME="Line-in Radio" \
-    STREAM_URL="http://localhost:${ICECAST_LISTEN_PORT}/stream.aac"
+    STREAM_URL="http://localhost:8000/stream.aac"
 
 COPY icecast.xml.tmpl /etc/icecast/icecast.xml.tmpl
 COPY entrypoint.sh /entrypoint.sh
